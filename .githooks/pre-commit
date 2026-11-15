@@ -1,0 +1,6 @@
+#!/bin/sh
+# Bloqueia commit se os testes falharem.
+npm test || {
+  echo "FAIL: os testes precisam passar antes do commit." >&2
+  exit 1
+}

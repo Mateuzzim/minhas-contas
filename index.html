@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101827" />
+  <meta name="description" content="Controle suas dívidas, parcelas e despesas." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./assets/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Minhas Contas</title>
+</head>
+<body>
+  <header class="topbar">
+    <div><div class="eyebrow">CONTROLE FINANCEIRO</div><h1>Minhas Contas</h1></div>
+    <button id="addMain" class="primary small">＋ Adicionar</button>
+  </header>
+
+  <main>
+    <section class="summary-grid">
+      <article class="hero-card">
+        <span class="muted">Saldo total em aberto</span>
+        <strong id="totalOpen" class="hero-value">R$ 0,00</strong>
+        <div class="progress-track"><div id="overallProgress" class="progress-fill"></div></div>
+        <div class="progress-labels"><span id="paidPercent">0% pago</span><span id="paidTotal">R$ 0,00 pagos</span></div>
+      </article>
+      <article class="metric"><span class="muted">Contas ativas</span><strong id="activeCount">0</strong></article>
+      <article class="metric"><span class="muted">Vence neste mês</span><strong id="dueMonth">R$ 0,00</strong></article>
+    </section>
+
+    <nav class="tabs" aria-label="Navegação principal">
+      <button class="tab active" data-tab="dashboard">Visão geral</button>
+      <button class="tab" data-tab="accounts">Minhas contas</button>
+      <button class="tab" data-tab="expenses">Despesas</button>
+      <button class="tab" data-tab="history">Histórico</button>
+    </nav>
+
+    <section id="dashboard" class="view active">
+      <div class="section-head"><div><div class="eyebrow">ACOMPANHAMENTO</div><h2>Próximos vencimentos</h2></div></div>
+      <div id="upcoming" class="stack"></div>
+      <div class="section-head"><div><div class="eyebrow">SEU PROGRESSO</div><h2>Contas em andamento</h2></div><button class="text-button" data-goto="accounts">Ver todas</button></div>
+      <div id="dashboardAccounts" class="stack"></div>
+    </section>
+
+    <section id="accounts" class="view">
+      <div class="section-head"><div><div class="eyebrow">DÍVIDAS E PARCELAMENTOS</div><h2>Minhas contas</h2></div><button class="primary" id="addDebt">＋ Nova conta</button></div>
+      <div id="accountList" class="stack"></div>
+    </section>
+
+    <section id="expenses" class="view">
+      <div class="section-head"><div><div class="eyebrow">GASTOS DO DIA A DIA</div><h2>Despesas</h2></div><button class="primary" id="addExpense">＋ Nova despesa</button></div>
+      <div class="filter-row"><select id="expenseFilter"><option value="all">Todas</option><option value="open">Em aberto</option><option value="paid">Pagas</option></select></div>
+      <div id="expenseList" class="stack"></div>
+    </section>
+
+    <section id="history" class="view">
+      <div class="section-head"><div><div class="eyebrow">REGISTROS</div><h2>Histórico de pagamentos</h2></div></div>
+      <div id="historyList" class="stack"></div>
+    </section>
+
+    <footer>Seus dados ficam salvos neste dispositivo. Faça backup regularmente.</footer>
+  </main>
+
+  <dialog id="accountDialog">
+    <form id="accountForm" method="dialog">
+      <div class="dialog-head"><div><div class="eyebrow">CADASTRO</div><h2 id="accountDialogTitle">Nova conta</h2></div><button type="button" class="icon-button" data-close="accountDialog">✕</button></div>
+      <input type="hidden" id="accountId" />
+      <label>Nome da conta<input id="accountName" required maxlength="60" placeholder="Ex.: Empréstimo, veículo..." /></label>
+      <div class="form-grid">
+        <label>Valor total (R$)<input id="accountAmount" required type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
+        <label>Valor da parcela (R$)<input id="accountInstallment" required type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
+        <label>Dia do vencimento<input id="accountDay" required type="number" min="1" max="31" value="10" /></label>
+        <label>Primeiro vencimento<input id="accountStart" required type="date" /></label>
+      </div>
+      <label>Categoria<select id="accountCategory"><option>Empréstimo</option><option>Veículo</option><option>Cartão</option><option>Casa</option><option>Compra</option><option>Outro</option></select></label>
+      <label>Observações<textarea id="accountNotes" rows="2" placeholder="Opcional"></textarea></label>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="accountDialog">Cancelar</button><button class="primary" type="submit">Salvar conta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="expenseDialog">
+    <form id="expenseForm" method="dialog">
+      <div class="dialog-head"><div><div class="eyebrow">GASTO</div><h2>Nova despesa</h2></div><button type="button" class="icon-button" data-close="expenseDialog">✕</button></div>
+      <input type="hidden" id="expenseId" />
+      <label>Descrição<input id="expenseName" required maxlength="70" placeholder="Ex.: Conta de luz" /></label>
+      <div class="form-grid">
+        <label>Valor (R$)<input id="expenseAmount" required type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
+        <label>Vencimento<input id="expenseDue" required type="date" /></label>
+      </div>
+      <label>Categoria<select id="expenseCategory"><option>Moradia</option><option>Alimentação</option><option>Transporte</option><option>Saúde</option><option>Serviços</option><option>Outro</option></select></label>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="expenseDialog">Cancelar</button><button class="primary" type="submit">Salvar despesa</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="paymentDialog">
+    <form id="paymentForm" method="dialog">
+      <div class="dialog-head"><div><div class="eyebrow">REGISTRAR PAGAMENTO</div><h2>Confirmar pagamento</h2></div><button type="button" class="icon-button" data-close="paymentDialog">✕</button></div>
+      <input type="hidden" id="paymentAccountId" />
+      <div id="paymentInfo" class="payment-info"></div>
+      <label>Valor pago (R$)<input id="paymentAmount" required type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
+      <label>Data do pagamento<input id="paymentDate" required type="date" /></label>
+      <label>Observação<textarea id="paymentNote" rows="2" placeholder="Opcional"></textarea></label>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="paymentDialog">Cancelar</button><button class="primary" type="submit">Registrar pagamento</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="./logic.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
